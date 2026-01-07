@@ -69,7 +69,7 @@ public abstract class CefInitMixin {
                             /*guiScreen instanceof ReceivingLevelScreen ||*/
                             guiScreen instanceof SelectWorldScreen ||
                             guiScreen instanceof DirectJoinServerScreen ||
-                            //? if > 1.21.5 {
+                            //? if > 1.21.8 {
                             guiScreen instanceof ManageServerScreen ||
                             //?} else
                             /*guiScreen instanceof EditServerScreen ||*/

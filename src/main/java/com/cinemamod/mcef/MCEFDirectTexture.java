@@ -34,7 +34,7 @@ public class MCEFDirectTexture extends AbstractTexture {
     private int height;
     
     public MCEFDirectTexture() {
-        this.defaultBlur = false;
+        //this.defaultBlur = false;
     }
     
     /**
@@ -83,7 +83,11 @@ public class MCEFDirectTexture extends AbstractTexture {
         
         protected DirectGlTexture(int textureId, int width, int height) {
             // Call parent constructor with dummy values, then override
-            super("MCEF Direct Texture", TextureFormat.RGBA8, width, height, 1, textureId);
+            //? > 1.21.5
+            super(0b1111, "MCEF Direct Texture", TextureFormat.RGBA8, width, height, 0, 1, textureId);
+            //? = 1.21.5
+            /*super("MCEF Direct Texture", TextureFormat.RGBA8, width, height, 1, textureId);*/
+
             this.width = width;
             this.height = height;
             // Mark as not closed

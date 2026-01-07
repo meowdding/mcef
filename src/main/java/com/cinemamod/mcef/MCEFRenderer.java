@@ -23,6 +23,7 @@ package com.cinemamod.mcef;
 import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.opengl.GlTexture;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.AddressMode;
 import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.textures.GpuTexture;
 import com.mojang.blaze3d.textures.TextureFormat;
@@ -30,6 +31,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.resources.Identifier;
 
 import java.nio.ByteBuffer;
+import java.util.OptionalDouble;
 import java.util.UUID;
 
 import static org.lwjgl.opengl.GL12.*;
@@ -39,7 +41,7 @@ public class MCEFRenderer {
     private GpuTexture texture;
     private int textureWidth = 0;
     private int textureHeight = 0;
-    
+
     // Identifier for this renderer's texture
     private Identifier textureLocation;
     private MCEFDirectTexture directTexture;
@@ -62,7 +64,7 @@ public class MCEFRenderer {
     public GpuTexture getTexture() {
         return texture;
     }
-    
+
     /**
      * Gets the Identifier that can be used with GuiGraphics and other Minecraft rendering methods.
      * This Identifier is registered with the TextureManager and points to the browser's texture.
@@ -70,14 +72,14 @@ public class MCEFRenderer {
     public Identifier getTextureLocation() {
         return textureLocation;
     }
-    
+
     /**
      * Check if the texture is ready for rendering with GuiGraphics
      */
     public boolean isTextureReady() {
         return texture != null && textureRegistered && directTexture != null;
     }
-    
+
     public int getTextureID() {
         // For compatibility, return the OpenGL ID if texture exists
         if (texture instanceof GlTexture) {
@@ -85,11 +87,11 @@ public class MCEFRenderer {
         }
         return 0;
     }
-    
+
     public int getTextureWidth() {
         return textureWidth;
     }
-    
+
     public int getTextureHeight() {
         return textureHeight;
     }
@@ -103,7 +105,7 @@ public class MCEFRenderer {
             texture.close();
             texture = null;
         }
-        
+
         // Unregister from TextureManager
         if (textureRegistered && textureLocation != null) {
             Minecraft.getInstance().getTextureManager().release(textureLocation);
@@ -117,39 +119,52 @@ public class MCEFRenderer {
             if (texture != null) {
                 texture.close();
             }
-            
             // Create new GpuTexture using the device
             String label = "MCEF Browser Texture " + width + "x" + height;
+
+            //? > 1.21.5 {
             texture = RenderSystem.getDevice().createTexture(
+                    label,
+                    0b1111,
+                    TextureFormat.RGBA8,
+                    width,
+                    height,
+                    1,
+                    1
+            );
+            //?} else {
+
+            /*texture = RenderSystem.getDevice().createTexture(
                 label,
                 TextureFormat.RGBA8,
                 width,
                 height,
-                1  // mipLevels
+                1
             );
-            
-            // Configure texture parameters
+
             texture.setTextureFilter(FilterMode.LINEAR, FilterMode.LINEAR, false);
             texture.setAddressMode(com.mojang.blaze3d.textures.AddressMode.CLAMP_TO_EDGE);
-            
+            *///?}
+
             textureWidth = width;
             textureHeight = height;
-            
+
             // Update the direct texture wrapper to point to our new texture
             if (directTexture != null && texture instanceof GlTexture glTexture) {
                 directTexture.setDirectTextureId(glTexture.glId(), width, height);
             }
         }
-        
+
         if (texture instanceof GlTexture glTexture) {
             // Bind the texture directly using its GL ID
             GlStateManager._bindTexture(glTexture.glId());
             GlStateManager._pixelStore(GL_UNPACK_ROW_LENGTH, width);
             GlStateManager._pixelStore(GL_UNPACK_SKIP_PIXELS, 0);
             GlStateManager._pixelStore(GL_UNPACK_SKIP_ROWS, 0);
-            
+
             // Upload the full texture
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
+            glTexImage2D(
+                    GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
                     GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, buffer);
         }
     }
@@ -158,7 +173,8 @@ public class MCEFRenderer {
         if (texture instanceof GlTexture glTexture) {
             // Bind and update sub-region
             GlStateManager._bindTexture(glTexture.glId());
-            glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, width, height, GL_BGRA,
+            glTexSubImage2D(
+                    GL_TEXTURE_2D, 0, x, y, width, height, GL_BGRA,
                     GL_UNSIGNED_INT_8_8_8_8_REV, buffer);
         }
     }

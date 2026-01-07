@@ -226,7 +226,7 @@ public final class MCEF {
             return parts[0].replace("+", "");
         }
 
-        return null;
+        return "eaeb3d4370aa3526ee237ad1981ad59af3de4dd1";
     }
 
     /**
