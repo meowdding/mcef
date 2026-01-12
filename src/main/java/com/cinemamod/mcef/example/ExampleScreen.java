@@ -41,9 +41,10 @@ import java.util.UUID;
 public class ExampleScreen extends Screen {
     private static final int BROWSER_DRAW_OFFSET = 20;
 
-
+    //? > 1.21.5 {
     protected Identifier exampleLocation;
     protected ExampleTexture exampleTexture;
+    //?}
     private MCEFBrowser browser;
 
     public ExampleScreen(Component component) {
@@ -53,16 +54,20 @@ public class ExampleScreen extends Screen {
     @Override
     protected void init() {
         super.init();
+
+        //? > 1.21.5 {
         exampleLocation = Identifier.fromNamespaceAndPath(
                 "example",
                 "frame_" + UUID.randomUUID().toString().replace("-", ""));
 
         exampleTexture = new ExampleTexture(-1, this.exampleLocation.toString());
+        //?}
         if (browser == null) {
             String url = "https://www.google.com";
             boolean transparent = true;
             browser = MCEF.createBrowser(url, transparent);
             resizeBrowser();
+            //? > 1.21.5
             Minecraft.getInstance().getTextureManager().register(this.exampleLocation, this.exampleTexture);
         }
     }
@@ -105,18 +110,23 @@ public class ExampleScreen extends Screen {
     @Override
     public void onClose() {
         browser.close();
+        //? > 1.21.5
+        Minecraft.getInstance().getTextureManager().release(exampleLocation);
         super.onClose();
     }
 
+    //? > 1.21.5 {
     private void updateFrame() {
         this.exampleTexture.setId(this.browser.getRenderer().getTextureID());
         this.exampleTexture.setWidth(this.width);
         this.exampleTexture.setHeight(this.height);
     }
+    //?}
 
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         super.render(guiGraphics, i, j, f);
+        //? if > 1.21.5 {
         this.updateFrame();
         guiGraphics.blit(
                 //? > 1.21.5
@@ -130,6 +140,15 @@ public class ExampleScreen extends Screen {
                 width - BROWSER_DRAW_OFFSET * 2, height - BROWSER_DRAW_OFFSET * 2,
                 Color.white.getRGB()
         );
+        //?} else {
+        /*// Check if the browser texture is ready for rendering
+        if (browser != null && browser.isTextureReady()) {
+            Identifier textureLocation = browser.getTextureLocation();
+            int frameRenderWidth = width - BROWSER_DRAW_OFFSET * 2;
+            int frameRenderHeight = height - BROWSER_DRAW_OFFSET * 2;
+            guiGraphics.blit(RenderType::guiTextured, textureLocation, BROWSER_DRAW_OFFSET, BROWSER_DRAW_OFFSET, 0.0F, 0.0F, frameRenderWidth, frameRenderHeight, frameRenderWidth, frameRenderHeight);
+        }
+        *///?}
     }
 
     @Override

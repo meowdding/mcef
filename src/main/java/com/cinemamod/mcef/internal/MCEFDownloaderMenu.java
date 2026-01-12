@@ -34,10 +34,17 @@ public class MCEFDownloaderMenu extends Screen {
         this.menu = menu;
     }
 
+    //? > 1.21.5 {
     @Override
     protected void renderBlurredBackground(GuiGraphics guiGraphics) {
         this.renderMenuBackground(guiGraphics);
     }
+    //?} else {
+    /*@Override
+    protected void renderBlurredBackground() {
+        super.renderBlurredBackground();
+    }
+    *///?}
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
